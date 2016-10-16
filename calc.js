@@ -1,7 +1,9 @@
 
 // TODO: DEFINE ANY VARIABLES HERE
 
-
+var previousNumber = null;
+var currentNumber = '';
+var operator = null;
 
 /**
  * 		EDIT ME!
@@ -12,9 +14,40 @@
  * @param  {String} buttonValue   The value of the button that was clicked on, for example 6 or "+"
  */
 function handleButtonClick(buttonValue) {
+    var result;
 
-    // TODO: YOUR CODE GOES IN HERE!
-
+    if (typeof(buttonValue) === 'number' || buttonValue === '.') {
+        currentNumber += buttonValue;
+        updateDisplay(buttonValue);
+    } else if (buttonValue === 'c') {
+        clearDisplay();
+        previousNumber = null;
+        currentNumber = '';
+        operator = null;
+    } else if (buttonValue === '=') {
+        currentNumber = Number(currentNumber);
+        clearDisplay();
+        if (previousNumber === null || !currentNumber) {
+            result = 'ERROR';
+        } else if (operator === '+') {
+            result = previousNumber + currentNumber;
+        } else if (operator === '-') {
+            result = previousNumber - currentNumber;
+        } else if (operator === '*') {
+            result = previousNumber * currentNumber;
+        } else if (operator === '/') {
+            result = previousNumber / currentNumber;
+        }
+        updateDisplay(result);
+        previousNumber = null;
+        currentNumber = '' + result;
+        operator = null;
+    } else {
+        previousNumber = Number(currentNumber);
+        currentNumber = '';
+        operator = buttonValue;
+        updateDisplay(buttonValue);
+    }
 }
 
 
