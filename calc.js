@@ -1,7 +1,12 @@
 
 // TODO: DEFINE ANY VARIABLES HERE
+const operators = ['*', '/', '+', '-'];
+const compilers = ['=', 'c'];
 
-
+let presses = [];
+let operPresses = [];
+let val1, val2;
+let total = 0;
 
 /**
  * 		EDIT ME!
@@ -12,11 +17,110 @@
  * @param  {String} buttonValue   The value of the button that was clicked on, for example 6 or "+"
  */
 function handleButtonClick(buttonValue) {
+    // add buttonValue to current display html if buttonValue is not '=' or 'c'
+    if (!compilers.includes(buttonValue)) {
+      presses.push(buttonValue);
+      updateDisplay(buttonValue);
+    } else if (buttonValue === '=') {
+      // find and store index of operators and their position in the equation
+      for (let index = 0; index < presses.length; index++) {
+        // find and store operator indexes
+        if (operators.includes(presses[index])) {
+          let opIndex = index;
+          operPresses.push(opIndex);
+        }
+      }
 
-    // TODO: YOUR CODE GOES IN HERE!
+      // keep showing current display if no operators were pressed
+      if (operPresses.length === 0) {
+        return;
+      } else { // otherwise evaluate each expression and return total
+        calculate();
+      }
+      clearDisplay();
+      updateDisplay(total);
+    }
 
+    // clear display if buttonValue is 'c'
+    if (buttonValue === 'c') {
+      clearDisplay();
+      presses = [];
+      operPresses = [];
+    }
 }
 
+function calculate() {
+  let isRecursion = false;
+  console.log(`p1: ${presses}`);
+  console.log(`op1: ${operPresses}`);
+  /*
+    When '=' is pressed:
+    1. combine pressed digits before first operator and store that value in val1 and total
+    2. combine pressed digits after first operator up until the next operator or end of pressed and store in val2
+    3. run expression with two values and update total
+    4. remove everything already calculated from arrays
+    5. if there are any operators remaining
+    6. iterate calculate until no operations remain
+  */
+  // 1. combine pressed digits before first operator and store that value in total
+  if (!isRecursion) {
+    val1 = parseFloat((presses.slice(0, (operPresses[0] + 1)).join('')), 10);
+    total = val1;
+  }
+  // 2. combine pressed digits after first operator up until the next operator or end of pressed
+  if (operPresses[1]) {
+    val2 = parseFloat(presses.slice(operPresses[0], (operPresses[1] + 1)).join(''), 10);
+  } else {
+    console.log('second');
+    val2 = parseFloat(presses.slice((operPresses[0] + 1)).join(''));
+  }
+  // 3. run expression with two values and update total
+  if (presses[operPresses[0]] === '+') {
+    add(val2);
+  } else if (presses[operPresses[0]] === '-') {
+    subtract(val2);
+  } else if (presses[operPresses[0]] === '*') {
+    multiply(val2);
+  } else if (presses[operPresses[0]] === '/') {
+    divide(val2);
+  }
+  // 4. remove everything already calculated from arrays
+  for (let index = 0; index <= operPresses[0]; index++) {
+    presses.shift();
+  }
+  presses[0] = total;
+  operPresses = [];
+  for (let index = 0; index < presses.length; index++) {
+    // find and store new operator indexes
+    if (operators.includes(presses[index])) {
+      let opIndex = index;
+      operPresses.push(opIndex);
+    }
+  }
+  console.log(`p2: ${presses}`);
+  console.log(`op2: ${operPresses}`);
+  console.log(total);
+  // 5. if there are any operations remaining
+  if (operPresses.length !== 0) {
+    isRecursion = true;
+    // 6. iterate calculate until no operations remain
+    calculate();
+  }
+}
+
+
+function add(num2) {
+  total += parseFloat(num2, 10);
+}
+function subtract(num2) {
+  total -= parseFloat(num2, 10);
+}
+function multiply(num2) {
+  total *= parseFloat(num2, 10);
+}
+function divide(num2) {
+  total /= parseFloat(num2, 10);
+}
 
 
 /** **************************************************************
